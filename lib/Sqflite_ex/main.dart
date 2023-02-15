@@ -1,115 +1,120 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:storagetool/Sqflite_ex/Sqloperation.dart';
+import 'Sqloperation.dart';
 
-void main(){
+void main() {
   runApp(MaterialApp(
-    home: Screen1(),
-    debugShowCheckedModeBanner: false,
+    home: HomeStorage(),
   ));
 }
 
-class Screen1 extends StatefulWidget {
-  const Screen1({Key? key}) : super(key: key);
-
+class HomeStorage extends StatefulWidget {
   @override
-  State<Screen1> createState() => _Screen1State();
+  State<StatefulWidget> createState() => HomeStorageState();
 }
 
-class _Screen1State extends State<Screen1> {
-  bool isLoading =true;
-  List<Map<String,dynamic>>datas=[];
+class HomeStorageState extends State {
+  bool isloading = true;
+  List<Map<String, dynamic>> datas = [];
 
-  void refreshdata()async{
-    final data=await SqlHelper.getItems();
+  void refreshdata() async {
+    final data = await SqlHelper.getItems();
     setState(() {
-      datas=data;
-
+      datas = data;
+      if (datas != null) {
+        isloading = false;
+      }
     });
   }
-@override
+
+  @override
   void initState() {
-   reassemble();
-    super.initState();
+    refreshdata();
   }
-  final title_controller=TextEditingController();
-  final  description_controller=TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Sqflite Demo"),
+        title: const Text('Sqflite Demo'),
       ),
-      body: isLoading?Center(child: CircularProgressIndicator()):ListView.builder(itemBuilder: (context,int)
-          {
-            return ListView.builder(
-              itemCount: datas.length,
-              itemBuilder: (context,index){
-              return Card(
-                child: ListTile(
-                  title: Text(datas[int]["title"]),
-                  subtitle: Text(datas[int]["description"]),
-                ),
-              );
-            });
-          }
-      ),
+      body: isloading
+          ? const CircularProgressIndicator()
+          : ListView.builder(
+          itemCount: datas.length,
+          itemBuilder: (context, int) {
+            return  Card(
+              child: ListTile(
+                title: Text(datas[int]['title']),
+                subtitle: Text(datas[int]['description']),
+              ),
+            );
+          }),
       floatingActionButton: FloatingActionButton(
-      onPressed: ()=>showform(null),
-      child: Icon(CupertinoIcons.add),
+        onPressed: () => showform(null),
+        child: const Icon(Icons.add),
       ),
     );
   }
 
- void showform(int ? id ) async{
-    if(id!=null){
-      //id == null create new id !=null update
-      final existing_data=datas.firstWhere((element) => element[id]==id);
-      title_controller.text=existing_data["title"];
-      description_controller.text=existing_data["description"];
+  final title_controller = TextEditingController();
+  final description_controller = TextEditingController();
+
+  void showform(int? id) async {
+    if (id != null) {
+      //id == null  create new   id != null   update
+      final existingData = datas.firstWhere((element) => element[id] == id);
+      title_controller.text       = existingData['title'];
+      description_controller.text = existingData['description'];
     }
-    showModalBottomSheet(context: context,
+    showModalBottomSheet(
+        context: context,
         elevation: 5,
         isScrollControlled: true,
-        builder: (context)=>Container(
-          padding: EdgeInsets.all(15),
+        builder: (context) => Container(
+          padding: EdgeInsets.only(
+            left: 15,
+            right: 15,
+            top: 15,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 120,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               TextField(
                 controller: title_controller,
-                decoration: InputDecoration(
-                  hintText: "Title"
-                ),
+                decoration: const InputDecoration(hintText: "Title"),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               TextField(
                 controller: description_controller,
-                decoration: InputDecoration(
-                  hintText: "Description"
-                ),
+                decoration: const InputDecoration(hintText: "Description"),
               ),
-              ElevatedButton(onPressed: ()async{
-                if(id==null){
-                  await createitem();
-                }
-                if(id ! ==null){
-                  //await updateItem();
-                }
-
-              }, child: Text(id==null?"Create new":"Update"))
+              const SizedBox(
+                height: 10,
+              ),
+              ElevatedButton(
+                  onPressed: () async {
+                    if (id == null) {
+                      await createItem();
+                    }
+                    if (id != null) {
+                      //  await updateItem();
+                    }
+                    title_controller.text = '';
+                    description_controller.clear();
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(id == null ? 'Create New' : "Update"))
             ],
           ),
-        ),
-    );
- }
+        ));
+  }
 
- Future<void> createitem() async{
-    await SqlHelper.create_item(title_controller.text,description_controller.text);
+  Future<void> createItem() async {
+    await SqlHelper.create_item(title_controller.text , description_controller.text);
     refreshdata();
- }
+  }
 }
