@@ -13,7 +13,7 @@ class HomeStorage extends StatefulWidget {
 }
 
 class HomeStorageState extends State {
-  bool isloading = true;
+  bool isLoading = true;
   List<Map<String, dynamic>> datas = [];
 
   void refreshdata() async {
@@ -21,7 +21,7 @@ class HomeStorageState extends State {
     setState(() {
       datas = data;
       if (datas != null) {
-        isloading = false;
+        isLoading = false;
       }
     });
   }
@@ -37,8 +37,8 @@ class HomeStorageState extends State {
       appBar: AppBar(
         title: const Text('Sqflite Demo'),
       ),
-      body: isloading
-          ? const CircularProgressIndicator()
+      body: isLoading
+          ? Center(child: const CircularProgressIndicator())
           : ListView.builder(
           itemCount: datas.length,
           itemBuilder: (context, int) {
@@ -75,7 +75,7 @@ class HomeStorageState extends State {
             left: 15,
             right: 15,
             top: 15,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 120,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 100,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,

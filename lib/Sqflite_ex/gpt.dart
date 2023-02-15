@@ -109,10 +109,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   final data = snapshot.data;
                   return Expanded(
                     child: ListView.builder(
-                      itemCount: data?.length,
+                      itemCount: data!.length,
                       itemBuilder: (context, index) {
                         return ListTile(
-                          title: Text(data![index]['name']),
+                          title: Text(data[index]['name']),
                           subtitle: Text('Age: ${data[index]['age']}'),
                           trailing: IconButton(
                             icon: Icon(Icons.delete),
